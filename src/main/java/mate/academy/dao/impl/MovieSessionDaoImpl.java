@@ -52,15 +52,16 @@ public class MovieSessionDaoImpl implements MovieSessionDao {
         LocalDateTime startOfNextDay = date.plusDays(1).atStartOfDay();
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<MovieSession> query = session.createQuery("from MovieSession s "
-                    + "WHERE s.movie.id = :nameOfMovie "
+                    + "WHERE s.movie.id = :movieId "
                     + "AND s.showTime >= :from "
                     + "AND s.showTime < :to ", MovieSession.class);
-            query.setParameter("nameOfMovie", movieId);
+            query.setParameter("movieId", movieId);
             query.setParameter("from", startOfDay);
             query.setParameter("to", startOfNextDay);
             return query.getResultList();
         } catch (Exception e) {
-            throw new DataProcessingException("Can't get all from MovieSession", e);
+            throw new DataProcessingException("Can't find available sessions for movieId: "
+                    + movieId + " and date: " + date, e);
         }
     }
 }
